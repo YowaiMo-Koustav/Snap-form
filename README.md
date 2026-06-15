@@ -8,12 +8,23 @@ This Turborepo includes the following packages/apps:
 
 ### Apps and Packages
 
-- `https`: [Next.js](https://nextjs.org/) frontend app (TypeScript + Tailwind CSS)
-- `api`: Express API server running on port 3001
-- `worker`: Background cron job service using `node-cron`
-- `@repo/ui`: a stub React component library shared by frontend applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+**1. `web` (Frontend)**
+- **Idea:** The main user-facing Next.js application for Snap-form.
+- **Technologies:** Next.js 16, React 19, TypeScript, Tailwind CSS v4.
+
+**2. `api` (Backend)**
+- **Idea:** The core backend server that handles requests from the web app.
+- **Technologies:** Express.js, TypeScript, Node.js.
+
+**3. `worker` (Background Jobs)**
+- **Idea:** A background service responsible for scheduled tasks and async processing.
+- **Technologies:** Node.js, `node-cron`, TypeScript.
+
+**Shared Packages:**
+- `@repo/ui`: A React component library shared by frontend applications.
+- `@repo/eslint-config`: Shared `eslint` configurations.
+- `@repo/typescript-config`: Shared `tsconfig.json`s used throughout the monorepo.
+
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
@@ -36,7 +47,7 @@ bun run build
 You can build a specific package using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
 
 ```sh
-bun exec turbo build --filter=https
+bun exec turbo build --filter=web
 bun exec turbo build --filter=api
 bun exec turbo build --filter=worker
 ```
@@ -50,14 +61,14 @@ bun run dev
 ```
 
 This will concurrently start:
-- `apps/https` — Next.js frontend at [http://localhost:3000](http://localhost:3000)
+- `apps/web` — Next.js frontend at [http://localhost:3000](http://localhost:3000)
 - `apps/api` — Express API at [http://localhost:3001](http://localhost:3001)
 - `apps/worker` — Background cron worker
 
 You can develop a specific package using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
 
 ```sh
-bun exec turbo dev --filter=https
+bun exec turbo dev --filter=web
 bun exec turbo dev --filter=api
 bun exec turbo dev --filter=worker
 ```
