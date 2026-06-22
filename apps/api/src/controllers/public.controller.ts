@@ -35,7 +35,7 @@ export const getPublicForm: RequestHandler = asyncHandler(
     // Validate the definition coming out of the DB before sending
     const definitionResult = FormDefinitionSchema.safeParse(form.fields);
     if (!definitionResult.success) {
-      console.error(`Corrupt form definition for slug "${slug}":`, definitionResult.error);
+      console.error("Corrupt form definition for slug:", slug, definitionResult.error);
       res.status(500).json({ success: false, message: "Form is currently unavailable" });
       return;
     }
