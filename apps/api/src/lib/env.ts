@@ -6,8 +6,14 @@ function requireEnv(key: string): string {
   return value;
 }
 
+const rawPort = process.env.PORT;
+const parsedPort = rawPort ? Number(rawPort) : 3000;
+if (!Number.isInteger(parsedPort) || parsedPort < 1 || parsedPort > 65535) {
+  throw new Error("Invalid PORT: must be an integer between 1 and 65535");
+}
+
 export const config = {
-  port: process.env.PORT || 3000,
+  port: parsedPort,
   databaseUrl: requireEnv("DATABASE_URL"),
   auth: {
     secret: requireEnv("BETTER_AUTH_SECRET"),
