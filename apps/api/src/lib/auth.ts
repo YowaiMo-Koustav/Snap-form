@@ -13,4 +13,24 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+
+  socialProviders: {
+    google: {
+      clientId: config.oauth.googleClientId,
+      clientSecret: config.oauth.googleClientSecret,
+    },
+    github: {
+      clientId: config.oauth.githubClientId,
+      clientSecret: config.oauth.githubClientSecret,
+    },
+  },
+  user: {
+    additionalFields: {
+      username: {
+        type: "string",
+        required: false,
+        defaultValue: null,
+      },
+    },
+  },
 });
