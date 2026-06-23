@@ -2,7 +2,9 @@
   "name": "worker",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
+    "lint": "eslint src/",
     "dev": "bun run src/index.ts",
     "build": "tsc"
   },
@@ -11,6 +13,8 @@
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "eslint": "^9.39.1",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.11.24",
     "@types/node-cron": "^3.0.11",

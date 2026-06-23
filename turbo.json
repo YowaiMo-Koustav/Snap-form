@@ -1,22 +1,26 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalEnv": ["DATABASE_URL"],
+  "globalEnv": [
+    "DATABASE_URL",
+    "PORT",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL"
+  ],
   "tasks": {
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "db:generate": {
       "cache": false,
-      "env": [
-        "DATABASE_URL"
-      ]
+      "env": ["DATABASE_URL"]
     },
     "db:migrate": {
       "cache": false,
-      "env": [
-        "DATABASE_URL"
-      ]
+      "env": ["DATABASE_URL"]
     },
     "db:deploy": {
       "cache": false,
