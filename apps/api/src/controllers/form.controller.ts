@@ -4,7 +4,6 @@ import { asyncHandler } from "../utils/async-handler";
 import { FormDefinitionSchema } from "@repo/types";
 import { CreateFormInput, UpdateFormInput } from "../lib/form-schemas";
 import prisma from "../lib/db";
-import { error } from "console";
 
 // ============================================
 // GET /api/v1/forms — list user's forms
