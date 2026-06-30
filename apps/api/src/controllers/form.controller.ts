@@ -173,7 +173,7 @@ export const updateForm: RequestHandler = asyncHandler(
       return;
     }
 
-    const { title, description, coverUrl, iconSymbol, requireEmail, slug, definition, type } = req.body as UpdateFormInput;
+    let { title, description, coverUrl, iconSymbol, requireEmail, slug, definition, type } = req.body as UpdateFormInput;
 
     if (definition !== undefined) {
       const parsed = FormDefinitionSchema.safeParse(definition);
@@ -185,6 +185,7 @@ export const updateForm: RequestHandler = asyncHandler(
         });
         return;
       }
+      definition = parsed.data;
     }
 
     try {
