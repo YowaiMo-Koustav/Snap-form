@@ -80,6 +80,7 @@ model UserOwnedTemplate {
 
   // ID of the Form cloned from the template during purchase
   clonedFormId String?
+  clonedForm   Form?   @relation(fields: [clonedFormId], references: [id], onDelete: SetNull)
 
   purchasedAt DateTime @default(now())
 

@@ -136,7 +136,7 @@ export const getTemplateById: RequestHandler = asyncHandler(
         const userId = res.locals.user?.id as string | undefined;
 
         // Extract review pagination params
-        const page = Math.max(1, parseInt(req.query.page as string) || 1);
+        const page = Math.min(1000, Math.max(1, parseInt(req.query.page as string) || 1));
         const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 10));
         const reviewSkip = (page - 1) * limit;
 
