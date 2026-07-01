@@ -33,9 +33,11 @@ model Form {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relations
+  // Relation
+ 
   responses        Response[]
   templates        Template[]
+   purchasedAsTemplate UserOwnedTemplate[]
   formIntegrations FormIntegration[]
 
   // Metadata
