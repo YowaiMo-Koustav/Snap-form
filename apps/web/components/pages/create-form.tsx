@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@repo/ui/components/ui/button";
@@ -70,7 +70,7 @@ type FormType = "scroll" | "step" | "chat";
 
 /* ── Field Type Metadata ─────────────────────────────────────────── */
 
-const FIELD_TYPE_OPTIONS: { value: FormFieldType; label: string; icon: typeof Type }[] = [
+const FIELD_TYPE_OPTIONS = [
   { value: "textInput", label: "Short Text", icon: Type },
   { value: "textarea", label: "Long Text", icon: AlignLeft },
   { value: "email", label: "Email", icon: Mail },
@@ -81,22 +81,14 @@ const FIELD_TYPE_OPTIONS: { value: FormFieldType; label: string; icon: typeof Ty
   { value: "datePicker", label: "Date", icon: Calendar },
   { value: "rating", label: "Rating", icon: Star },
   { value: "heading", label: "Heading", icon: Heading },
-];
+] as const;
+
+const FIELD_ICON_MAP = Object.fromEntries(
+  FIELD_TYPE_OPTIONS.map((opt) => [opt.value, opt.icon])
+) as Record<FormFieldType, typeof Type>;
 
 function getFieldIcon(type: FormFieldType) {
-  switch (type) {
-    case "textInput": return Type;
-    case "textarea": return AlignLeft;
-    case "email": return Mail;
-    case "phone": return Phone;
-    case "dropdown": return ChevronDown;
-    case "multipleChoice": return ListOrdered;
-    case "checkbox": return Checkbox as unknown as typeof Type;
-    case "datePicker": return Calendar;
-    case "rating": return Star;
-    case "heading": return Heading;
-    default: return Type;
-  }
+  return FIELD_ICON_MAP[type] ?? Type;
 }
 
 /* ── Mock Data ───────────────────────────────────────────────────── */
@@ -448,6 +440,27 @@ export function CreateFormPage() {
   const [saveState, setSaveState] = useState<"unsaved" | "saving" | "saved">("unsaved");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
 
+  /* ── Refs for timeout cleanup ─────────────────────────────────── */
+  const aiTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const publishTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  /* ── Cleanup on unmount ──────────────────────────────────────── */
+  useEffect(() => {
+    return () => {
+      if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current);
+      publishTimersRef.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  /* ── Auto-scroll chat to bottom ──────────────────────────────── */
+  useEffect(() => {
+    chatScrollRef.current?.scrollTo({
+      top: chatScrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [chatMessages]);
+
   /* ── Field Operations ────────────────────────────────────────── */
 
   const updateField = useCallback(
@@ -466,7 +479,7 @@ export function CreateFormPage() {
       if (idx === -1) return prev;
       const clone = {
         ...prev[idx],
-        id: `field-${Date.now()}`,
+        id: `field-${crypto.randomUUID()}`,
         label: `${prev[idx].label} (Copy)`,
       };
       const next = [...prev];
@@ -485,7 +498,7 @@ export function CreateFormPage() {
     setFields((prev) => [
       ...prev,
       {
-        id: `field-${Date.now()}`,
+        id: `field-${crypto.randomUUID()}`,
         type: "textInput",
         label: "New Field",
         placeholder: "Enter value...",
@@ -501,7 +514,7 @@ export function CreateFormPage() {
   const sendChatMessage = useCallback(() => {
     if (!chatInput.trim()) return;
     const userMsg: ChatMessage = {
-      id: `msg-${Date.now()}`,
+      id: `msg-${crypto.randomUUID()}`,
       role: "user",
       content: chatInput,
     };
@@ -509,9 +522,10 @@ export function CreateFormPage() {
     setChatInput("");
 
     // Simulate AI response
-    setTimeout(() => {
+    if (aiTimeoutRef.current) clearTimeout(aiTimeoutRef.current);
+    aiTimeoutRef.current = setTimeout(() => {
       const aiMsg: ChatMessage = {
-        id: `msg-${Date.now() + 1}`,
+        id: `msg-${crypto.randomUUID()}`,
         role: "ai",
         content:
           "I've updated the form based on your request. Check the preview on the right.",
@@ -524,9 +538,11 @@ export function CreateFormPage() {
   /* ── Mock Save ───────────────────────────────────────────────── */
 
   const handlePublish = useCallback(() => {
+    publishTimersRef.current.forEach(clearTimeout);
+    publishTimersRef.current = [];
     setSaveState("saving");
-    setTimeout(() => setSaveState("saved"), 1500);
-    setTimeout(() => setSaveState("unsaved"), 5000);
+    publishTimersRef.current.push(setTimeout(() => setSaveState("saved"), 1500));
+    publishTimersRef.current.push(setTimeout(() => setSaveState("unsaved"), 5000));
   }, []);
 
   return (
@@ -658,7 +674,7 @@ export function CreateFormPage() {
                   className="h-full flex flex-col"
                 >
                   {/* Chat History */}
-                  <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+                  <div ref={chatScrollRef} className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
                     {chatMessages.map((msg) => (
                       <ChatBubble key={msg.id} message={msg} />
                     ))}
