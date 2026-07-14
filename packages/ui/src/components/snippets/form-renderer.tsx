@@ -1,5 +1,5 @@
 import type { FormDefinition, FormResponseData } from "@repo/types";
-import { snippetRegistry } from "./registry";
+import { snippetRegistry, type SnippetType } from "./registry";
 
 type FormRendererProps = {
   /** Parsed, validated form definition */
@@ -33,7 +33,8 @@ export function FormRenderer({
   return (
     <div className={["flex flex-col gap-6", className].filter(Boolean).join(" ")}>
       {definition.elements.map((element) => {
-        const SnippetComponent = snippetRegistry[element.type];
+        const type = element.type as SnippetType;
+        const SnippetComponent = snippetRegistry[type];
 
         // Guard: if a type is somehow not in the registry (e.g. future DB data
         // with a type added before a frontend deploy), render a fallback.

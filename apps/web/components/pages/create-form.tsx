@@ -58,11 +58,11 @@ type FormField = {
   /** Options for dropdown, multipleChoice, checkbox */
   options: FieldOption[];
   /** Max rating for rating type */
-  max: number;
+  max?: number;
   /** Min value for number type */
-  min: number;
+  min?: number;
   /** Step for number type */
-  step: number;
+  step?: number;
 };
 
 type ChatMessage = {
@@ -104,10 +104,15 @@ function createField(type: FormFieldType): FormField {
     required: false,
     validateFormat: false,
     options: [],
-    max: 5,
-    min: 0,
-    step: 1,
   };
+
+  if (type === "rating") {
+    base.max = 5;
+  }
+  
+  if (type === "numberInput") {
+    base.step = 1;
+  }
 
   // Seed default options for types that need them
   if (type === "dropdown" || type === "multipleChoice" || type === "checkbox") {
@@ -223,9 +228,16 @@ function EditSettingsPanel({
           <select
             className="w-full border border-border bg-background text-sm p-2 pr-8 outline-none focus:border-foreground transition-colors rounded-md appearance-none"
             value={field.type}
-            onChange={(e) =>
-              onUpdate(field.id, { type: e.target.value as FormFieldType })
-            }
+            onChange={(e) => {
+              const newType = e.target.value as FormFieldType;
+              const newFieldDefaults = createField(newType);
+              onUpdate(field.id, {
+                ...newFieldDefaults,
+                id: field.id, // Preserve id
+                label: field.label, // Preserve label
+                required: field.required // Preserve required state
+              });
+            }}
           >
             {FIELD_TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>

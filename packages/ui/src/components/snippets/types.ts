@@ -38,7 +38,7 @@ export type SnippetProps<T, V = string | number | boolean | string[] | null> = {
 };
 
 export type TextInputSnippetProps = SnippetProps<TextInputElement, string>;
-export type NumberInputSnippetProps = SnippetProps<NumberInputElement, number>;
+export type NumberInputSnippetProps = SnippetProps<NumberInputElement, number | null>;
 export type RatingSnippetProps = SnippetProps<RatingElement, number>;
 export type MultipleChoiceSnippetProps = SnippetProps<MultipleChoiceElement, string>;
 export type CheckboxSnippetProps = SnippetProps<CheckboxElement, string[]>;
