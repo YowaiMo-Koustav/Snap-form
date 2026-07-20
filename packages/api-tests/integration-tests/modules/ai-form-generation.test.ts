@@ -8,17 +8,24 @@ import type { Mock } from "bun:test";
 
 describe("AI Form Generation", () => {
   let mockSend: Mock<(...args: any[]) => any>;
+  let originalApiKey: string;
+  let originalModel: string;
 
   beforeEach(async () => {
     await cleanDb();
+    originalApiKey = config.ai.apiKey;
+    originalModel = config.ai.model;
     config.ai.apiKey = "test-key";
     config.ai.model = "test-model";
   });
 
   afterEach(() => {
-    config.ai.apiKey = "";
-    config.ai.model = "nvidia/nemotron-3-ultra-550b-a55b:free";
-    if (mockSend) mockSend.mockRestore();
+    config.ai.apiKey = originalApiKey;
+    config.ai.model = originalModel;
+    if (mockSend) {
+      mockSend.mockRestore();
+      mockSend = undefined as any;
+    }
   });
 
   it("should return 503 when AI service is not configured", async () => {
