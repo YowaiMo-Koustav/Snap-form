@@ -1,13 +1,17 @@
-export function injectIds(definition: { elements?: { id?: string; options?: { id?: string }[] | null }[] }) {
+import { randomUUID } from "node:crypto";
 
-    if (!Array.isArray(definition?.elements)) return;
+export function injectIds(definition: { elements?: unknown[] }) {
+  if (!Array.isArray(definition?.elements)) return;
 
-    for (const el of definition.elements) {
-        el.id = crypto.randomUUID();
-        if (Array.isArray(el.options)) {
-            for (const opt of el.options) {
-                opt.id = crypto.randomUUID();
-            }
-        }
+  for (const el of definition.elements) {
+    if (!el || typeof el !== "object") continue;
+    (el as Record<string, unknown>).id = randomUUID();
+    const opts = (el as Record<string, unknown>).options;
+    if (Array.isArray(opts)) {
+      for (const opt of opts) {
+        if (!opt || typeof opt !== "object") continue;
+        (opt as Record<string, unknown>).id = randomUUID();
+      }
     }
+  }
 }
