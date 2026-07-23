@@ -29,6 +29,7 @@ export function DropdownSnippet({
           id={element.id}
           role="combobox"
           aria-disabled="true"
+          aria-expanded="false"
           className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background opacity-50 cursor-not-allowed"
         >
           <span className="text-muted-foreground">
