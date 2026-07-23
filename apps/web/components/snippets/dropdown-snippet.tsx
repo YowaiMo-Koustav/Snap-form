@@ -25,7 +25,12 @@ export function DropdownSnippet({
         <p className="text-xs text-muted-foreground">{element.description}</p>
       )}
       {readOnly ? (
-        <div className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background opacity-50 cursor-not-allowed">
+        <div
+          id={element.id}
+          role="combobox"
+          aria-disabled="true"
+          className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background opacity-50 cursor-not-allowed"
+        >
           <span className="text-muted-foreground">
             {element.placeholder ?? "Select an option…"}
           </span>

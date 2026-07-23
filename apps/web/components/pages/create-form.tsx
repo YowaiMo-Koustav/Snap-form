@@ -513,20 +513,24 @@ function SnippetItem({
 function CanvasFieldCard({
   field,
   index,
+  totalFields,
   onUpdate,
   onDuplicate,
   onDelete,
   isExpanded,
   onToggleExpand,
+  onMoveField,
   onSnippetDropOnCard,
 }: {
   field: FormField;
   index: number;
+  totalFields: number;
   onUpdate: (id: string, updates: Partial<FormField>) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
   isExpanded: boolean;
   onToggleExpand: (id: string) => void;
+  onMoveField: (fromIndex: number, toIndex: number) => void;
   onSnippetDropOnCard: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
 }) {
   const IconComponent = getFieldIcon(field.type);
@@ -564,9 +568,27 @@ function CanvasFieldCard({
         onClick={() => onToggleExpand(field.id)}
       >
         <span
+          role="button"
+          tabIndex={0}
           className="cursor-grab p-0.5 text-muted-foreground hover:text-foreground touch-none"
-          aria-label="Drag to reorder"
-          onPointerDown={(e) => dragControls.start(e)}
+          aria-label={`Reorder ${field.label}, position ${index + 1} of ${totalFields}. Use arrow keys to move.`}
+          aria-roledescription="sortable"
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            dragControls.start(e);
+          }}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowUp" && index > 0) {
+              e.preventDefault();
+              e.stopPropagation();
+              onMoveField(index, index - 1);
+            } else if (e.key === "ArrowDown" && index < totalFields - 1) {
+              e.preventDefault();
+              e.stopPropagation();
+              onMoveField(index, index + 1);
+            }
+          }}
         >
           <GripVertical className="size-4" />
         </span>
@@ -1071,11 +1093,21 @@ export function CreateFormPage() {
                       key={field.id}
                       field={field}
                       index={index}
+                      totalFields={fields.length}
                       onUpdate={updateField}
                       onDuplicate={duplicateField}
                       onDelete={deleteField}
                       isExpanded={expandedFieldId === field.id}
                       onToggleExpand={toggleExpandField}
+                      onMoveField={(from, to) => {
+                        setFields((prev) => {
+                          const next = [...prev];
+                          const [removed] = next.splice(from, 1);
+                          next.splice(to, 0, removed);
+                          return next;
+                        });
+                        setSaveState("unsaved");
+                      }}
                       onSnippetDropOnCard={handleSnippetDropOnCard}
                     />
                   ))}
